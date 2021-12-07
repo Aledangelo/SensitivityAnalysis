@@ -83,9 +83,6 @@ print('Number of Cluster: ' + str(num_cluster))
 print('\nVariance with PCA: ' + str(v) + ' %')
 print('Lost Variance with PCA: ' + str(varLostPCA) + ' %')
 
-# pp.figure(figsize=(10, 7))
-# pp.scatter(principalComponents[:, 0], principalComponents[:, 1])
-
 try:
     linked = AgglomerativeClustering(n_clusters=num_cluster, linkage='ward', affinity='euclidean', compute_distances=True,
                                      compute_full_tree=False).fit(principalComponents)
@@ -135,10 +132,3 @@ print('Inter Cluster Variance: ' + str(B_per) + ' %')
 sium = (varLostPCA + (W_per * v)) / 100
 print('\nTotal variance: ' + str(sium) + ' %')
 print('Total Variance Lost: ' + str(100 - sium) + ' %')
-
-# pp.figure(figsize=(10, 7))
-# pp.scatter(linked[:, 0], linked[:, 1])
-# pp.figure(figsize=(10, 7))
-# dendrogram(linked, orientation='right')
-
-#pp.show()
