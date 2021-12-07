@@ -6,17 +6,14 @@ from scipy.cluster.hierarchy import dendrogram
 from matplotlib import pyplot as pp
 from sklearn.cluster import AgglomerativeClustering
 
-workload = list()
-# num_cluster = 20
-# num_component = 4
 
+workload = list()
 
 def varTOT(data):
     t = 0
     for i in range(len(data)):
         t = pow(data.values[i] - data.values.mean(0), 2) + t
 
-    # print(data.values.mean(0))
     tmp = 0
     for i in range(len(t)):
         tmp = tmp + t[i]
@@ -48,10 +45,11 @@ def createClusterDict(cluster):
 
 def readData(name, path):
     data = pd.read_excel(str(path) + str(name) + '.xlsx')
-    data = pd.DataFrame(data).drop(columns=["label", "responseCode", "responseMessage", "threadName", "dataType", "success", "URL", "IdleTime", "Principale1", "Principale2", "Principale3", "Cluster"])
+    # If you don't want to read all the columns, uncomment the following line of code and enter the column names to ignore
+    # data = pd.DataFrame(data).drop(columns=["column1", "column2", "column3"])
 
     norm_file = stats.zscore(data)
-    # norm_file = pd.DataFrame(norm_data).drop(columns=["label", "responseCode", "responseMessage", "threadName", "dataType", "success", "grpThreads", "allThreads", "URL", "Latency", "IdleTime", "Connect", "Principale1", "Principale2", "Principale3", "Cluster"])
+    # norm_file = pd.DataFrame(norm_data).drop(columns=["column1", "column2", "column3"])
     norm_path = str(path) + str(name) + '_normalized.csv'
     norm_file.to_csv(norm_path)
 
@@ -71,20 +69,19 @@ def varPCA(data, n):
     return res, v, varianceLostPCA
 
 
-name = input('Nome File: ')
-num_component = int(input('Numero di Componenti Principali: '))
-num_cluster = int(input('Numero di Cluster: '))
-# name = 'PCA1_NO_OUTLIERS'
-path = '/Users/alessandro/Documents/Università/Impianti di Elaborazione/esercizi/homework3_Pietro/'
+name = input('File Name: ')
+num_component = int(input('Number of Principal Components: '))
+num_cluster = int(input('Number of Cluster: '))
+path = 'pathToYourFile'
 
 norm_file = readData(name, path)
 
 principalComponents, v, varLostPCA = varPCA(norm_file, num_component)
-print('Componenti principali: ' + str(num_component))
-print('Numero di Cluster: ' + str(num_cluster))
+print('Principal Components: ' + str(num_component))
+print('Number of Cluster: ' + str(num_cluster))
 
-print('\nVarianza Mantenuta con PCA: ' + str(v) + ' %')
-print('Varianza Persa con PCA: ' + str(varLostPCA) + ' %')
+print('\nVariance with PCA: ' + str(v) + ' %')
+print('Lost Variance with PCA: ' + str(varLostPCA) + ' %')
 
 # pp.figure(figsize=(10, 7))
 # pp.scatter(principalComponents[:, 0], principalComponents[:, 1])
@@ -97,7 +94,6 @@ except Exception as e:
     quit()
 
 dict_cluster = createClusterDict(linked)
-# print(dict_cluster)
 
 W = 0
 B = 0
@@ -133,20 +129,12 @@ for i in range(num_cluster):
     B = B_sum + B
 
 W_per, B_per = varCL(intra=W, inter=B)
-print('\nVarianza Intra Cluster: ' + str(W_per) + ' %')
-print('Varianza Inter Cluster: ' + str(B_per) + ' %')
+print('\nIntra Cluster Variance: ' + str(W_per) + ' %')
+print('Inter Cluster Variance: ' + str(B_per) + ' %')
 
 sium = (varLostPCA + (W_per * v)) / 100
-# sium = B / varTOT(norm_file)
-print('\nVarianza Totale mantenuta: ' + str(sium) + ' %')
-print('Varianza Totale Persa: ' + str(100 - sium) + ' %')
-
-# print('\nDevianza totale: ' + str(B / varTOT(norm_file)) + ' %')
-# print('\nB: ' + str(B))
-# print('W: ' + str(W))
-# print(B/varTOT(norm_file))
-
-# print(norm_file.values[1])
+print('\nTotal variance: ' + str(sium) + ' %')
+print('Total Variance Lost: ' + str(100 - sium) + ' %')
 
 # pp.figure(figsize=(10, 7))
 # pp.scatter(linked[:, 0], linked[:, 1])
